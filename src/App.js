@@ -16,7 +16,6 @@ import { fetchCamps, addCamp, subscribeToCamps } from './supabaseClient';
 
 // Utils
 import { WEEKS, ANIMATION_VARIANTS } from './utils/constants';
-import { calculateTotalPrice } from './utils/helpers';
 
 function App() {
   // ==========================================
@@ -27,9 +26,18 @@ function App() {
   const [error, setError] = useState(null);
   const [schedule, setSchedule] = useState({ 2: null, 3: null });
   const [activeCategory, setActiveCategory] = useState('All');
-  const [viewMode, setViewMode] = useState('desktop'); // 改為預設 desktop
+  const [viewMode, setViewMode] = useState('desktop');
   const [selectedCamp, setSelectedCamp] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
+
+  // ==========================================
+  // 計算總價函數（直接定義在這裡）
+  // ==========================================
+  const calculateTotalPrice = (schedule) => {
+    return Object.values(schedule).reduce((total, camp) => {
+      return total + (camp?.price || 0);
+    }, 0);
+  };
 
   // ==========================================
   // 資料載入 (從 Supabase)
@@ -173,7 +181,7 @@ function App() {
         variants={ANIMATION_VARIANTS.fadeIn}
       >
         {/* Header */}
-        <Header totalPrice={totalPrice} viewMode={viewMode} />
+        <Header totalPrice={totalPrice} />
 
         {/* Main Content */}
         <main className={`flex-1 overflow-y-auto p-4 flex flex-col gap-6 ${viewMode === 'mobile' ? 'max-w-md mx-auto' : 'max-w-6xl mx-auto w-full p-6'}`}>
