@@ -1,22 +1,22 @@
-import React, { useState, useEffect, useMemo } from "react";
-import { motion, AnimatePresence } from "framer-motion";
-import { Plus } from "lucide-react";
+import React, { useState, useEffect, useMemo } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Plus } from 'lucide-react';
 
 // Components
-import Header from "./components/Header";
-import DeviceToggle from "./components/DeviceToggle";
-import ScheduleGrid from "./components/ScheduleGrid";
-import CategoryFilter from "./components/CategoryFilter";
-import CampCard from "./components/CampCard";
-import CampDetailModal from "./components/CampDetailModal";
-import AddCampModal from "./components/AddCampModal";
+import Header from './components/Header';
+import DeviceToggle from './components/DeviceToggle';
+import ScheduleGrid from './components/ScheduleGrid';
+import CategoryFilter from './components/CategoryFilter';
+import CampCard from './components/CampCard';
+import CampDetailModal from './components/CampDetailModal';
+import AddCampModal from './components/AddCampModal';
 
 // Supabase
-import { fetchCamps, addCamp, subscribeToCamps } from "./supabaseClient";
+import { fetchCamps, addCamp, subscribeToCamps } from './supabaseClient';
 
 // Utils
-import { WEEKS, ANIMATION_VARIANTS } from "./utils/constants";
-import { calculateTotalPrice } from "./utils/helpers";
+import { WEEKS, ANIMATION_VARIANTS } from './utils/constants';
+import { calculateTotalPrice } from './utils/helpers';
 
 function App() {
   // ==========================================
@@ -26,8 +26,8 @@ function App() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
   const [schedule, setSchedule] = useState({ 2: null, 3: null });
-  const [activeCategory, setActiveCategory] = useState("All");
-  const [viewMode, setViewMode] = useState("mobile");
+  const [activeCategory, setActiveCategory] = useState('All');
+  const [viewMode, setViewMode] = useState('desktop'); // 改為預設 desktop
   const [selectedCamp, setSelectedCamp] = useState(null);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
 
@@ -39,7 +39,7 @@ function App() {
 
     // 訂閱即時更新
     const unsubscribe = subscribeToCamps(() => {
-      console.log("Camps data changed, reloading...");
+      console.log('Camps data changed, reloading...');
       loadCamps();
     });
 
@@ -57,7 +57,7 @@ function App() {
       setCamps(data);
     } catch (err) {
       setError(err.message);
-      console.error("Failed to load camps:", err);
+      console.error('Failed to load camps:', err);
     } finally {
       setLoading(false);
     }
@@ -67,8 +67,8 @@ function App() {
   // 營隊篩選
   // ==========================================
   const filteredCamps = useMemo(() => {
-    if (activeCategory === "All") return camps;
-    return camps.filter((camp) => camp.category === activeCategory);
+    if (activeCategory === 'All') return camps;
+    return camps.filter(camp => camp.category === activeCategory);
   }, [camps, activeCategory]);
 
   // ==========================================
@@ -86,9 +86,9 @@ function App() {
    * 切換營隊加入排程
    */
   const handleToggleCamp = (camp, weekId) => {
-    setSchedule((prev) => ({
+    setSchedule(prev => ({
       ...prev,
-      [weekId]: prev[weekId]?.id === camp.id ? null : camp,
+      [weekId]: prev[weekId]?.id === camp.id ? null : camp
     }));
   };
 
@@ -96,9 +96,9 @@ function App() {
    * 從週次移除營隊
    */
   const handleRemoveCamp = (weekId) => {
-    setSchedule((prev) => ({
+    setSchedule(prev => ({
       ...prev,
-      [weekId]: null,
+      [weekId]: null
     }));
   };
 
@@ -108,20 +108,12 @@ function App() {
   const handleAddCamp = async (campData) => {
     try {
       const newCamp = await addCamp(campData);
-      setCamps((prev) => [...prev, newCamp]);
+      setCamps(prev => [...prev, newCamp]);
     } catch (error) {
-      console.error("Failed to add camp:", error);
-      alert("新增失敗，請稍後再試");
+      console.error('Failed to add camp:', error);
+      alert('新增失敗，請稍後再試');
     }
   };
-
-  // ==========================================
-  // 容器樣式
-  // ==========================================
-  const wrapperClass =
-    viewMode === "mobile"
-      ? "w-[393px] mx-auto border-[12px] border-slate-900 rounded-[50px] shadow-2xl overflow-hidden h-[852px] relative bg-white ring-4 ring-slate-300/50"
-      : "min-h-screen bg-white";
 
   // ==========================================
   // 載入狀態
@@ -137,7 +129,7 @@ function App() {
           <motion.div
             className="w-16 h-16 border-4 border-indigo-600 border-t-transparent rounded-full mx-auto mb-4"
             animate={{ rotate: 360 }}
-            transition={{ duration: 1, repeat: Infinity, ease: "linear" }}
+            transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
           />
           <p className="text-slate-600 font-medium">載入營隊資料中...</p>
         </motion.div>
@@ -169,46 +161,25 @@ function App() {
   // 主要渲染
   // ==========================================
   return (
-    <div
-      className={`bg-slate-100 font-sans text-slate-800 ${
-        viewMode === "desktop"
-          ? "min-h-screen"
-          : "py-10 flex items-center justify-center min-h-screen"
-      }`}
-    >
+    <div className="bg-slate-100 font-sans text-slate-800 min-h-screen">
       {/* Device Toggle */}
       <DeviceToggle viewMode={viewMode} setViewMode={setViewMode} />
 
       {/* Main Container */}
       <motion.div
-        className={`${wrapperClass} flex flex-col transition-all duration-300`}
+        className="min-h-screen bg-white flex flex-col transition-all duration-300"
         initial="hidden"
         animate="visible"
         variants={ANIMATION_VARIANTS.fadeIn}
       >
-        {/* iPhone Notch */}
-        {viewMode === "mobile" && (
-          <div className="absolute top-2 left-1/2 -translate-x-1/2 h-8 w-[120px] bg-black rounded-full z-50 pointer-events-none" />
-        )}
-
         {/* Header */}
         <Header totalPrice={totalPrice} viewMode={viewMode} />
 
         {/* Main Content */}
-        <main
-          className={`flex-1 overflow-y-auto p-4 flex flex-col gap-6 ${
-            viewMode === "mobile"
-              ? "scrollbar-thin"
-              : "max-w-6xl mx-auto w-full p-6"
-          }`}
-        >
+        <main className={`flex-1 overflow-y-auto p-4 flex flex-col gap-6 ${viewMode === 'mobile' ? 'max-w-md mx-auto' : 'max-w-6xl mx-auto w-full p-6'}`}>
           {/* Week Cards Section */}
           <motion.section
-            className={`grid gap-4 ${
-              viewMode === "mobile"
-                ? "grid-cols-1"
-                : "grid-cols-1 md:grid-cols-2"
-            }`}
+            className={`grid gap-4 ${viewMode === 'mobile' ? 'grid-cols-1' : 'grid-cols-1 md:grid-cols-2'}`}
             variants={ANIMATION_VARIANTS.staggerContainer}
           >
             {WEEKS.map((week) => (
@@ -239,7 +210,7 @@ function App() {
                   自訂
                 </motion.button>
               </div>
-
+              
               {/* Category Filter */}
               <CategoryFilter
                 activeCategory={activeCategory}
@@ -249,11 +220,7 @@ function App() {
 
             {/* Camp Cards Grid */}
             <motion.div
-              className={`grid gap-3 ${
-                viewMode === "mobile"
-                  ? "grid-cols-1"
-                  : "grid-cols-1 sm:grid-cols-2 lg:grid-cols-3"
-              }`}
+              className={`grid gap-3 ${viewMode === 'mobile' ? 'grid-cols-1' : 'grid-cols-1 sm:grid-cols-2 lg:grid-cols-3'}`}
               variants={ANIMATION_VARIANTS.staggerContainer}
             >
               <AnimatePresence mode="popLayout">
@@ -281,11 +248,6 @@ function App() {
             )}
           </motion.section>
         </main>
-
-        {/* Home Indicator (iPhone) */}
-        {viewMode === "mobile" && (
-          <div className="h-1 w-1/3 bg-slate-900 rounded-full mx-auto mb-3 opacity-20" />
-        )}
       </motion.div>
 
       {/* Modals */}

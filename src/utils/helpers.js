@@ -1,78 +1,73 @@
-/**
- * 計算營隊時段標籤（全日 / 半日）
- */
-export const getDurationTag = (camp) => {
-  const details = camp.details || {};
-  const grids = [details.grid, details.gridWeek1, details.gridWeek2]
-    .filter(Boolean)
-    .flat();
+import React from 'react';
+import { motion } from 'framer-motion';
+import { Calendar } from 'lucide-react';
 
-  for (const row of grids) {
-    // 檢查是否有下午時段
-    if (
-      row.time &&
-      (parseInt(row.time) >= 13 ||
-        row.time.includes("13:") ||
-        row.time.includes("14:") ||
-        row.time.includes("15:") ||
-        row.time.includes("16:"))
-    ) {
-      return "全";
-    }
-
-    // 檢查是否包含午餐
-    const rowStr = JSON.stringify(row).toLowerCase();
-    if (rowStr.includes("lunch") || rowStr.includes("午餐")) {
-      return "全";
+const ANIMATION_VARIANTS = {
+  slideDown: {
+    hidden: { opacity: 0, y: -20 },
+    visible: { 
+      opacity: 1, 
+      y: 0,
+      transition: { duration: 0.4, ease: 'easeOut' }
     }
   }
-
-  return "半";
 };
 
-/**
- * 從顏色類別中提取背景色
- */
-export const extractBgColor = (colorClass) => {
-  if (!colorClass) return "bg-gray-100";
-  const match = colorClass.match(/bg-[\w-]+/);
-  return match ? match[0] : "bg-gray-100";
-};
-
-/**
- * 計算總價格
- */
-export const calculateTotalPrice = (schedule) => {
-  return Object.values(schedule).reduce((total, camp) => {
-    return total + (camp?.price || 0);
-  }, 0);
-};
-
-/**
- * 格式化價格顯示
- */
-export const formatPrice = (price) => {
-  if (!price) return "$0";
+const formatPrice = (price) => {
+  if (!price) return '$0';
   return `$${price.toLocaleString()}`;
 };
 
-/**
- * 檢查營隊是否在特定週次開課
- */
-export const isCampAvailableInWeek = (camp, weekId) => {
-  return camp.available_weeks?.includes(weekId) || false;
+const Header = ({ totalPrice }) => {
+  return (
+    <motion.header 
+      className="sticky top-0 z-30 bg-white/95 backdrop-blur-md border-b border-slate-200 shadow-sm shrink-0"
+      initial="hidden"
+      animate="visible"
+      variants={ANIMATION_VARIANTS.slideDown}
+    >
+      <div className="mx-auto px-4 py-3 flex justify-between items-center">
+        {/* Logo 和標題 */}
+        <motion.div 
+          className="flex items-center gap-3"
+          whileHover={{ scale: 1.02 }}
+          transition={{ type: "spring", stiffness: 300 }}
+        >
+          <div className="w-8 h-8 bg-gradient-to-br from-indigo-600 to-purple-600 rounded-lg flex items-center justify-center text-white shadow-md">
+            <Calendar size={16} strokeWidth={3} />
+          </div>
+          <div>
+            <h1 className="text-lg font-bold text-slate-900 leading-none">
+              Winter Planner
+            </h1>
+            <span className="text-[10px] text-slate-500 font-medium tracking-wide">
+              2026 幼兒冬令營 (5歲)
+            </span>
+          </div>
+        </motion.div>
+
+        {/* 總價顯示 */}
+        <motion.div 
+          className="flex items-center gap-2 bg-gradient-to-r from-slate-50 to-indigo-50 px-3 py-1.5 rounded-xl border border-slate-100 shadow-sm"
+          whileHover={{ scale: 1.05 }}
+          transition={{ type: "spring", stiffness: 400 }}
+        >
+          <span className="text-[10px] text-slate-400 font-bold uppercase">
+            Total
+          </span>
+          <motion.span 
+            className="text-lg font-black text-indigo-600"
+            key={totalPrice}
+            initial={{ scale: 1.2, color: '#10b981' }}
+            animate={{ scale: 1, color: '#4f46e5' }}
+            transition={{ duration: 0.3 }}
+          >
+            {formatPrice(totalPrice)}
+          </motion.span>
+        </motion.div>
+      </div>
+    </motion.header>
+  );
 };
 
-/**
- * 生成唯一 ID
- */
-export const generateUniqueId = (prefix = "custom") => {
-  return `${prefix}-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
-};
-
-/**
- * 深度複製物件
- */
-export const deepClone = (obj) => {
-  return JSON.parse(JSON.stringify(obj));
-};
+export default Header;
