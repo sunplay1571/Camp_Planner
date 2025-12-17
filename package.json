@@ -5,12 +5,13 @@
   "keywords": [],
   "main": "src/index.tsx",
   "dependencies": {
+    "@supabase/supabase-js": "2.39.0",
+    "ajv": "^8.17.1",
+    "framer-motion": "12.23.26",
+    "lucide-react": "0.561.0",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
-    "react-scripts": "^5.0.0",
-    "lucide-react": "0.561.0",
-    "framer-motion": "12.23.26",
-    "@supabase/supabase-js": "2.87.3"
+    "react-scripts": "^5.0.0"
   },
   "devDependencies": {
     "@types/react": "19.0.0",
